@@ -111,7 +111,7 @@ def main():
     parser.add_argument("-e", "--exp_name", type=str, default="single")
     args = parser.parse_args()
 
-    gs.init()
+    gs.init(backend=gs.cpu)
 
     env_cfg, obs_cfg, reward_cfg, command_cfg = get_cfgs()
 
@@ -132,7 +132,7 @@ def main():
     )
 
     policy = torch.jit.load(f"./backflip/{args.exp_name}.pt")
-    policy.to(device="cuda:0")
+    policy.to(device="cpu")
 
     obs, _ = env.reset()
     with torch.no_grad():

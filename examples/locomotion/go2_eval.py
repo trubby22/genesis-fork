@@ -15,7 +15,7 @@ def main():
     parser.add_argument("--ckpt", type=int, default=100)
     args = parser.parse_args()
 
-    gs.init()
+    gs.init(backend=gs.cpu)
 
     log_dir = f"logs/{args.exp_name}"
     env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg = pickle.load(open(f"logs/{args.exp_name}/cfgs.pkl", "rb"))
@@ -30,10 +30,10 @@ def main():
         show_viewer=True,
     )
 
-    runner = OnPolicyRunner(env, train_cfg, log_dir, device="cuda:0")
+    runner = OnPolicyRunner(env, train_cfg, log_dir, device="cpu")
     resume_path = os.path.join(log_dir, f"model_{args.ckpt}.pt")
     runner.load(resume_path)
-    policy = runner.get_inference_policy(device="cuda:0")
+    policy = runner.get_inference_policy(device="cpu")
 
     obs, _ = env.reset()
     with torch.no_grad():

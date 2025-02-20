@@ -12,7 +12,7 @@ import genesis as gs
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--exp_name", type=str, default="go2-walking")
-    parser.add_argument("--ckpt", type=int, default=100)
+    parser.add_argument("--ckpt", type=int, default=1)
     args = parser.parse_args()
 
     gs.init(backend=gs.cpu)
@@ -36,11 +36,17 @@ def main():
     policy = runner.get_inference_policy(device="cpu")
 
     obs, _ = env.reset()
+
+    gs.tools.run_in_another_thread(fn=run_sim, args=(env, policy, obs))
+    env.scene.viewer.start()
+
+def run_sim(env, policy, obs):
     with torch.no_grad():
         while True:
             actions = policy(obs)
             obs, _, rews, dones, infos = env.step(actions)
 
+    env.scene.viewer.stop()
 
 if __name__ == "__main__":
     main()

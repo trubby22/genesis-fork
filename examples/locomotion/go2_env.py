@@ -2,14 +2,14 @@ import torch
 import math
 import genesis as gs
 from genesis.utils.geom import quat_to_xyz, transform_by_quat, inv_quat, transform_quat_by_quat
-
+import sys
 
 def gs_rand_float(lower, upper, shape, device):
     return (upper - lower) * torch.rand(size=shape, device=device) + lower
 
 
 class Go2Env:
-    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False, device="cpu"):
+    def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=True, device="cpu"):
         self.device = torch.device(device)
 
         self.num_envs = num_envs
@@ -66,6 +66,8 @@ class Go2Env:
 
         # build
         self.scene.build(n_envs=num_envs)
+        if sys.platform == "darwin":
+            self.scene._visualizer._viewer._pyrender_viewer._renderer.dpscale = 1
 
         # names to indices
         self.motor_dofs = [self.robot.get_joint(name).dof_idx_local for name in self.env_cfg["dof_names"]]
